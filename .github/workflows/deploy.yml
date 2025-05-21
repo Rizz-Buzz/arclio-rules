@@ -1,0 +1,63 @@
+name: Deploy Arclio Rules
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-asyncio
+        pip install -r requirements.txt
+        
+    - name: Run tests
+      run: |
+        pytest
+  
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: arclio/rules-api:latest
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to Kubernetes
+      uses: Azure/k8s-deploy@v1
+      with:
+        namespace: arclio
+        manifests: |
+          k8s/deployment.yml
+          k8s/service.yml
+        images: |
+          arclio/rules-api:latest
+        kubectl-version: latest
