@@ -5,14 +5,14 @@ CYAN   := $(shell tput -Txterm setaf 6)
 RESET  := $(shell tput -Txterm sgr0)
 
 
-install: ## Install & sync backend dependencies, initialize the database and run migrations
+install: ## Install & sync backend dependencies
 	@echo "${GREEN}Installing backend dependencies...${RESET}"
 	source .env && \
 	uv pip install -e .
 	make sync
 	@echo "${GREEN}Backend dependencies installed.${RESET}"
 
-build:
+build: ## Build the backend
 	source .env && \
 	uv build
 
@@ -32,7 +32,7 @@ pre-commit: ## Run pre-commit checks (combines lint, type-check and format)
 	make type-check
 
 
-run-dev:
+run-dev: ## Run the development server
 	@echo "$(YELLOW)Starting development server...$(RESET)"
 	source .env && \
 	uvicorn src.main:app --port $$PORT --reload
