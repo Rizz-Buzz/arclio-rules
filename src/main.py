@@ -28,8 +28,7 @@ app.include_router(rules_router)
 
 
 def use_route_names_as_operation_ids(app: FastAPI) -> None:
-    """Simplify operation IDs so that generated API clients have simpler function
-    names.
+    """Simplify operation IDs so that generated API clients have simpler function names.
 
     Should be called only after all routes have been added.
     """

@@ -27,6 +27,11 @@ class ResolvedRule(BaseModel):
 
 class RuleResolutionService:
     def __init__(self, config):
+        """Initialize the RuleResolutionService.
+
+        Args:
+            config (dict): Configuration dictionary containing necessary parameters.
+        """
         self.rule_cache = {}  # Dict[str, RuleCacheEntry]
         self.CACHE_TTL = 5 * 60  # 5 minutes in seconds
         self.config = config

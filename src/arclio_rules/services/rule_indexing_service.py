@@ -12,6 +12,11 @@ rule_storage_service = RuleStorageService(config={})
 
 class RuleIndexingService:
     def __init__(self, config):
+        """Initialize the RuleIndexingService.
+
+        Args:
+            config (dict): Configuration dictionary containing necessary parameters.
+        """
         # Initialize Elasticsearch client
         es_url = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
         self.es = AsyncElasticsearch([es_url])

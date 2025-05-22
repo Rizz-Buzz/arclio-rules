@@ -28,6 +28,11 @@ class RuleMetadata(BaseModel):
 
 class RuleStorageService:
     def __init__(self, config):
+        """Initialize the RuleStorageService.
+
+        Args:
+            config (dict): Configuration dictionary containing necessary parameters.
+        """
         self.github_token = os.environ.get("GITHUB_TOKEN")
         self.github_org = os.environ.get("GITHUB_ORG", "arclio")
         self.base_temp_dir = Path(tempfile.gettempdir()) / "arclio-rules"
