@@ -1,10 +1,11 @@
 import re
 import time
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 import frontmatter
+from pydantic import BaseModel
 
 from src.arclio_rules.services.rule_storage_service import RuleStorageService
-from pydantic import BaseModel
 
 rule_storage_service = RuleStorageService(config={})
 

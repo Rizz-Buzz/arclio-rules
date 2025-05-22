@@ -1,9 +1,9 @@
 import os
 import tempfile
-from typing import Dict, List, Optional, Any
 from pathlib import Path
-from git import Repo
+from typing import Any, Dict, List, Optional
 
+from git import Repo
 from loguru import logger
 from pydantic import BaseModel
 

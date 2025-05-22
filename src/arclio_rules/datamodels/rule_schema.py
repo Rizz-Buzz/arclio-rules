@@ -1,5 +1,5 @@
-from typing import List, Dict, Any
 from datetime import date, datetime
+from typing import Any, Dict, List
 
 rule_schema: Dict[str, Any] = {
     "path": str,  # Full path to the rule within the repository

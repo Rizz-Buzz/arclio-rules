@@ -1,9 +1,9 @@
 import os
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any, Dict
 
-from elasticsearch import AsyncElasticsearch
 import frontmatter
+from elasticsearch import AsyncElasticsearch
 
 from src.arclio_rules.services.rule_storage_service import RuleStorageService
 

@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException, Query
 from typing import List, Optional
+
+from fastapi import APIRouter, HTTPException, Query
+from loguru import logger
 from pydantic import BaseModel
 
-from loguru import logger
-
-from src.arclio_rules.services.rule_storage_service import (
-    RuleStorageService,
-    RuleSaveRequest,
-)
 from src.arclio_rules.services.rule_indexing_service import RuleIndexingService
 from src.arclio_rules.services.rule_resolution_service import RuleResolutionService
+from src.arclio_rules.services.rule_storage_service import (
+    RuleSaveRequest,
+    RuleStorageService,
+)
 
 router = APIRouter(prefix="/api/rules")
 rule_storage_service = RuleStorageService(config={})
@@ -28,8 +28,7 @@ class ApplyRulesRequest(BaseModel):
     operation_id="get_rule",
 )
 async def get_rule(client_id: str, rule_path: str):
-    """
-    Get a rule from the client repository using the provided client ID and rule path.
+    """Get a rule from the client repository using the provided client ID and rule path.
     This function fetches the rule content from the storage service and returns it.
     If the rule is not found, it raises an HTTPException with a 404 status code.
 
