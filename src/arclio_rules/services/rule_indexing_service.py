@@ -5,8 +5,10 @@ from datetime import datetime
 from elasticsearch import AsyncElasticsearch
 import frontmatter
 
-from rule_storage_service import RuleStorageService
+from src.arclio_rules.services.rule_storage_service import RuleStorageService
+
 rule_storage_service = RuleStorageService(config={})
+
 
 class RuleIndexingService:
     def __init__(self, config):

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from fastapi_mcp import FastApiMCP
 
-from arclio_rules.routes.rules import router as rules_router
+from src.arclio_rules.routes.rules import router as rules_router
 
 from loguru import logger
 

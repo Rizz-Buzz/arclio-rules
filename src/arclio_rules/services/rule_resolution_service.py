@@ -3,7 +3,7 @@ import time
 from typing import Dict, List, Optional, Any
 import frontmatter
 
-from rule_storage_service import RuleStorageService
+from src.arclio_rules.services.rule_storage_service import RuleStorageService
 from pydantic import BaseModel
 
 rule_storage_service = RuleStorageService(config={})
