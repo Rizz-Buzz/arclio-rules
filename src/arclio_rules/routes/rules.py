@@ -4,9 +4,12 @@ from pydantic import BaseModel
 
 from loguru import logger
 
-from rule_storage_service import RuleStorageService, RuleSaveRequest
-from rule_indexing_service import RuleIndexingService
-from rule_resolution_service import RuleResolutionService
+from src.arclio_rules.services.rule_storage_service import (
+    RuleStorageService,
+    RuleSaveRequest,
+)
+from src.arclio_rules.services.rule_indexing_service import RuleIndexingService
+from src.arclio_rules.services.rule_resolution_service import RuleResolutionService
 
 router = APIRouter(prefix="/api/rules")
 rule_storage_service = RuleStorageService(config={})
