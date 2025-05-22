@@ -34,15 +34,14 @@ class RuleStorageService:
             config (dict): Configuration dictionary containing necessary parameters.
         """
         self.github_token = os.environ.get("GITHUB_TOKEN")
+        if not self.github_token:
+            raise ValueError("GitHub token is not set in environment variables.")
         self.github_org = os.environ.get("GITHUB_ORG", "arclio")
+        if not self.github_org:
+            raise ValueError("GitHub organization is not set in environment variables.")
         self.base_temp_dir = Path(tempfile.gettempdir()) / "arclio-rules"
         self.base_temp_dir.mkdir(exist_ok=True)
         self.config = config
-        logger.info(
-            f"\nGitHub org: {self.github_org}"
-            f"\nGitHub token: {self.github_token is not None}"
-            f"\nBase temp dir: {self.base_temp_dir}"
-        )
 
     async def init_client_repository(self, client_id: str, client_name: str):
         """Initialize a new client repository from template."""
