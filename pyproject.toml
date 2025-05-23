@@ -71,4 +71,11 @@ convention = "google"
 asyncio_mode = "auto"
 
 [tool.poe.tasks.start-dev]
-shell = "source .env && uvicorn src.main:app --port $PORT --reload"
+shell = "source .env && uvicorn src.arclio_rules.main:app --port $PORT --reload"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/arclio_rules"]
+
+[project.scripts]
+arclio-rules = "arclio_rules.server_with_session:main"
+arclio-rules-stdio = "arclio_rules.server_wo_session:main"

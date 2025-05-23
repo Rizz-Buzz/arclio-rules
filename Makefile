@@ -32,10 +32,20 @@ pre-commit: ## Run pre-commit checks (combines lint, type-check and format)
 	make type-check
 
 
-run-dev: ## Run the development server
-	@echo "$(YELLOW)Starting development server...$(RESET)"
+run-dev-old: ## Run the development server : using old package implementation
+	@echo "$(YELLOW)Starting development server using old implementation...$(RESET)"
 	source .env && \
-	uvicorn src.main:app --port $$PORT --reload
+	uvicorn src.arclio_rules.main:app --port $$PORT --reload
+
+run-dev-stdio: ## Run the development server using stdio
+	@echo "$(YELLOW)Starting development server using stdio...$(RESET)"
+	source .env && \
+	uv run arclio-rules-stdio
+
+run-dev-streamable-http: ## Run the development server using streamable http
+	@echo "$(YELLOW)Starting development server using streamable http...$(RESET)"
+	source .env && \
+	uv run arclio-rules
 
 # SOPS
 init-key: ## Generate new age key and configure shell
