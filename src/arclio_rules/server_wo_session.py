@@ -94,9 +94,9 @@ async def check_mcp(mcp: FastMCP):
     resources = await mcp.get_resources()
     templates = await mcp.get_resource_templates()
 
-    logger.info(f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}")
+    logger.info(f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}")  # noqa E501
     logger.info(
-        f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"
+        f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # noqa E501 # type: ignore
     )
     logger.info(
         f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa E501

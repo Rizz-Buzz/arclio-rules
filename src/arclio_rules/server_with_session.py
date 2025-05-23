@@ -1,9 +1,9 @@
 import asyncio
+import threading
+from typing import Optional
 
 from fastmcp import FastMCP
 from loguru import logger
-import threading
-from typing import Optional
 
 # In-memory session store (thread-safe for concurrent access)
 session_store: dict = {}
@@ -13,7 +13,19 @@ mcp = FastMCP(name="Arclio-rules using fastmcp 🚀")
 
 
 # Helper function to store/retrieve session data
-def store_session_data(session_id: Optional[str], key: str, value: any) -> None:
+def store_session_data(
+    session_id: Optional[str],
+    key: str,
+    value: any,
+) -> None:
+    """Store session data for a given session ID and key.
+
+    This function checks if the session ID exists in the session store and updates the value.
+    Args:
+        session_id (Optional[str]): _session_id_ to check.
+        key (str): _key_ to store.
+        value (any): _value_ to store.
+    """  # noqa E501
     if session_id:
         with session_lock:
             if session_id not in session_store:
@@ -22,6 +34,16 @@ def store_session_data(session_id: Optional[str], key: str, value: any) -> None:
 
 
 def get_session_data(session_id: Optional[str], key: str) -> any:
+    """Retrieve session data for a given session ID and key.
+    This function checks if the session ID exists in the session store and retrieves
+
+    Args:
+        session_id (Optional[str]): _session_id_ to check.
+        key (str): _key_ to retrieve.
+
+    Returns:
+        any: The value associated with the key in the session store, or None if not found.
+    """  # noqa E501
     if session_id and session_id in session_store:
         with session_lock:
             return session_store.get(session_id, {}).get(key)
@@ -45,16 +67,9 @@ def add(a: int, b: int, context: dict = None) -> dict:
 @mcp.resource("config://version")
 def get_version() -> dict:
     """Get the version of the application, with session tracking"""
-    session_id = context.get("sessionId") if context else None
-    # Log access to version resource
-    access_key = "version_access_count"
-    current_count = get_session_data(session_id, access_key) or 0
-    store_session_data(session_id, access_key, current_count + 1)
-
     return {
         "version": "2.0.1",
         "sessionId": "session_id",
-        "access_count": current_count + 1,
     }
 
 
@@ -114,9 +129,9 @@ async def check_mcp(mcp: FastMCP):
     resources = await mcp.get_resources()
     templates = await mcp.get_resource_templates()
 
-    logger.info(f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}")
+    logger.info(f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}")  # noqa E501
     logger.info(
-        f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"
+        f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # noqa E501 # type: ignore
     )
     logger.info(
         f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa E501

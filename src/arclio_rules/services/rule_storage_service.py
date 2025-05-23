@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from git import Repo
-from loguru import logger
 from pydantic import BaseModel
 
 
