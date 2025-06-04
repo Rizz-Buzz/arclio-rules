@@ -12,10 +12,6 @@ install: ## Install & sync backend dependencies
 	make sync
 	@echo "${GREEN}Backend dependencies installed.${RESET}"
 
-build: ## Build the backend
-	source .env && \
-	uv build
-
 # For Python Development
 lint:	## Run linting tools
 	uv tool run ruff check --fix .
@@ -32,10 +28,10 @@ pre-commit: ## Run pre-commit checks (combines lint, type-check and format)
 	make type-check
 
 
-run-dev: ## Run the development server
-	@echo "$(YELLOW)Starting development server...$(RESET)"
+run-dev: ## Run the development server using stdio
+	@echo "$(YELLOW)Starting development server using stdio...$(RESET)"
 	source .env && \
-	uvicorn src.main:app --port $$PORT --reload
+	uv run arclio-rules
 
 # SOPS
 init-key: ## Generate new age key and configure shell
@@ -116,3 +112,12 @@ add-recipient: ## Add new public key (make add-recipient KEY=age1...)
 		mv .sops.yaml.tmp .sops.yaml && \
 		echo "${GREEN}Added key to .sops.yaml${RESET}"; \
 	fi
+
+build: ## Build the backend
+	source .env && \
+	uv build
+
+publish: ## Publish the package to PyPI
+	@echo "${YELLOW}Uploading to PyPI...${RESET}"
+	python -m twine upload --repository pypi dist/* --verbose
+	@echo "${GREEN}Package uploaded successfully.${RESET}"
