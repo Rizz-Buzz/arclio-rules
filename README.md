@@ -137,7 +137,6 @@ arclio-rules/
 │       │   ├── client_schema.py
 │       │   └── rule_schema.py
 │       ├── inhouse_rules/
-│       │   ├── __init__.py
 │       │   └── example_rule.py
 │       ├── main.py
 │       ├── routes/
