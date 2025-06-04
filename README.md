@@ -120,21 +120,34 @@ make add-recipient   # Add new public key (make add-recipient KEY=age1...)
 
 ## Project Structure
 arclio-rules/
+├── .github/
+│   └── workflows/
+│       └── linting-and-pyright.yml
+├── .gitignore
+├── LICENSE
+├── Makefile
+├── README.md
+├── pyproject.toml
+├── pyrightconfig.json
 ├── src/
-│ └── arclio_rules/
-│ ├── datamodels/ # Data models and schemas
-│ ├── inhouse_rules/ # Internal rule implementations
-│ ├── routes/ # API route handlers
-│ ├── services/ # Business logic services
-│ ├── main.py # Application entry point
-│ ├── server_with_session.py # Session-based server
-│ └── server_wo_session.py # Stateless server
-├── dist/ # Distribution files
-├── routes/ # API route definitions
-├── Makefile # Development automation
-├── pyproject.toml # Project configuration
-├── .env.example # Example environment configuration
-└── docker-compose.yml # Docker composition file
+│   └── arclio_rules/
+│       ├── __init__.py
+│       ├── __main__.py
+│       ├── datamodels/
+│       │   ├── client_schema.py
+│       │   └── rule_schema.py
+│       ├── inhouse_rules/
+│       │   ├── __init__.py
+│       │   └── example_rule.py
+│       ├── main.py
+│       ├── routes/
+│       │   └── rules.py
+│       └── services/
+│           ├── rule_indexing_service.py
+│           ├── rule_resolution_service.py
+│           └── rule_storage_service.py
+├── tests/
+└── .env.example
 
 
 ## Configuration
