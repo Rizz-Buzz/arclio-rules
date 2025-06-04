@@ -10,24 +10,8 @@ from loguru import logger
 from arclio_rules.routes.rules import router as rules_router
 from arclio_rules.services.rule_storage_service import RuleStorageService
 
-
-def get_app_info() -> dict:
-    """Get the information of the application.
-
-    Returns:
-        dict: A dictionary containing the version, name and description of the application.
-    """  # noqa: E501
-    with open("pyproject.toml", "r") as file:
-        data = file.read()
-    version = data.split("version = ")[1].split("\n")[0].strip('"')
-    name = data.split("name = ")[1].split("\n")[0].strip('"')
-    description = data.split("description = ")[1].split("\n")[0].strip('"')
-    return {"version": version, "name": name, "description": description}
-
-
 app = FastAPI(
-    name=get_app_info()["name"],
-    description=get_app_info()["description"],
+    name="arclio-rules", description="Arclio-rules mcp-server created using fastmcp 🚀"
 )
 origins = []
 if "ALLOWED_ORIGIN" in os.environ:
@@ -47,24 +31,6 @@ app.add_middleware(
 app.include_router(rules_router)
 
 mcp = FastMCP.from_fastapi(app=app)
-
-
-# static resource
-@mcp.resource(
-    uri="data://app-status",
-    name="ApplicationStatus",
-    description="Provides the current status of the application.",
-    mime_type="application/json",
-    tags={"monitoring", "status"},
-)
-def get_application_status() -> dict:
-    """Internal function description (ignored if description is provided above)."""
-    return {
-        "status": "OK",
-        "version": get_app_info()["version"],
-        "name": get_app_info()["name"],
-        "description": get_app_info()["description"],
-    }
 
 
 # create another mcp resource
@@ -135,13 +101,6 @@ async def check_mcp(mcp: FastMCP):
     Args:
         mcp (FastMCP): The MCP instance to check.
     """
-    # Get the version and status of the application
-    app_info = get_app_info()
-    logger.info(f"Status: {get_application_status()['status']}")
-    logger.info(f"Name: {app_info['name']}")
-    logger.info(f"Version: {app_info['version']}")
-    logger.info(f"Description: {app_info['description']}\n")
-
     # List the components that were created
     tools = await mcp.get_tools()
     resources = await mcp.get_resources()
