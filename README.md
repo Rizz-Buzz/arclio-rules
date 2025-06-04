@@ -79,15 +79,11 @@ ENVIRONMENT=development       # Application environment
 
 The service can be run in two modes:
 
-### Session-Based Mode
-```bash
-arclio-rules
-```
 
 ### Stateless Mode (using stdio)
 ```bash
 source .env
-arclio-rules-stdio
+arclio-rules
 ```
 
 ### Development Mode
@@ -101,9 +97,10 @@ The project includes a comprehensive Makefile for common development tasks:
 
 ```bash
 # Development
-make run-dev          # Run development server
+make run-dev         # Run development server
 make install         # Install dependencies
 make build           # Build the project
+make publish         # Publish the project to pypi
 
 # Code Quality
 make lint            # Run Ruff linter
