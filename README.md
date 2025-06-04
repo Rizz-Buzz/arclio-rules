@@ -94,6 +94,88 @@ arclio-rules
 make run-dev
 ```
 
+## Adding mcp-server on Arclio
+
+Add these two configuration JSON templates to be able to add arclio-rules to Arclio as an mcp-server.
+
+`Configuration Template JSON`
+```bash
+{
+  "mcpServers": {
+    "arclio-rules": {
+      "command": "uvx",
+      "args": [
+        "--from",
+        "arclio-rules",
+        "arclio-rules"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "{{github_token}}",
+        "GITHUB_ORG": "{{github_org}}",
+        "REPO_NAME": "{{repo_name}}",
+        "PORT": "{{port}}",
+        "HOST": "{{host}}",
+        "LOG_LEVEL": "{{log_level}}",
+        "ENVIRONMENT": "{{environment}}"
+      }
+    }
+  }
+}
+```
+
+`UI Schema JSON`
+```bash
+{
+  "sections": [
+    {
+      "title": "GitHub Configuration",
+      "type": "instructions",
+      "content": "Configure GitHub access for rule repository management"
+    },
+    {
+      "title": "GitHub Personal Access Token",
+      "type": "password",
+      "field": "github_token"
+    },
+    {
+      "title": "GitHub Organization",
+      "type": "text",
+      "field": "github_org"
+    },
+    {
+      "title": "Repository Name",
+      "type": "text",
+      "field": "repo_name"
+    },
+    {
+      "title": "Server Configuration",
+      "type": "instructions",
+      "content": "Configure server settings (optional - defaults will be used if not specified)"
+    },
+    {
+      "title": "Application Port",
+      "type": "text",
+      "field": "port"
+    },
+    {
+      "title": "Host Address",
+      "type": "text",
+      "field": "host"
+    },
+    {
+      "title": "Log Level",
+      "type": "text",
+      "field": "log_level"
+    },
+    {
+      "title": "Environment",
+      "type": "text",
+      "field": "environment"
+    }
+  ]
+}
+```
+
 ## Development Commands
 
 The project includes a comprehensive Makefile for common development tasks:
