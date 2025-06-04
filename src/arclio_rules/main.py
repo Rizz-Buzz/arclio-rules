@@ -19,8 +19,6 @@ if "ALLOWED_ORIGIN" in os.environ:
 else:
     origins.append("*")
 
-
-logger.info(f"ALLOWED ORIGINS: {origins}")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -121,7 +119,7 @@ def use_route_names_as_operation_ids(app: FastAPI) -> None:
     """
     for route in app.routes:
         if isinstance(route, APIRoute):
-            route.operation_id = route.name  # in this case, 'read_items'
+            route.operation_id = route.name
 
 
 use_route_names_as_operation_ids(app)
