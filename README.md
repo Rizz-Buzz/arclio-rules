@@ -68,6 +68,7 @@ REPO_NAME="add your repo that holds the rules here"
 ```
 
 Default Environmental Variables (No need to modify):
+```
 # Server Configuration
 PORT=8000                     # Application port
 HOST=0.0.0.0                  # Host to bind to
