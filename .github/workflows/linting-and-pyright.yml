@@ -1,0 +1,40 @@
+
+name: Lint and Type Check
+
+on:
+  push:
+    branches: ['**']
+    # paths:
+    #   - 'backend/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version-file: [".python-version"]
+    defaults:
+      run:
+        working-directory: .
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv pip install -e .
+
+      - name: Run Ruff (lint and format)
+        run: |
+          uv tool run ruff check --fix .
+          uv tool run ruff format .
+
+      - name: Analyze the code with pyright - type checking
+        run: uv tool run pyright .

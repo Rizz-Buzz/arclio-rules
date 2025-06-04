@@ -1,5 +1,5 @@
-from typing import List, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List
 
 client_schema: Dict[str, Any] = {
     "id": str,  # Unique client identifier

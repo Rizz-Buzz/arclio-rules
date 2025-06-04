@@ -1,17 +1,22 @@
 import os
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any, Dict
 
-from elasticsearch import AsyncElasticsearch
 import frontmatter
+from elasticsearch import AsyncElasticsearch
 
-from src.arclio_rules.services.rule_storage_service import RuleStorageService
+from arclio_rules.services.rule_storage_service import RuleStorageService
 
 rule_storage_service = RuleStorageService(config={})
 
 
 class RuleIndexingService:
     def __init__(self, config):
+        """Initialize the RuleIndexingService.
+
+        Args:
+            config (dict): Configuration dictionary containing necessary parameters.
+        """
         # Initialize Elasticsearch client
         es_url = os.environ.get("ELASTICSEARCH_URL", "http://localhost:9200")
         self.es = AsyncElasticsearch([es_url])
@@ -67,7 +72,8 @@ class RuleIndexingService:
 
     async def _walk_and_index_directory(self, client_id: str, directory: str):
         """Recursively walk directory and index all rules."""
-        result = await rule_storage_service.list_rules(client_id, directory)
+        # TODO : Note the client ID was removed from the list rules function
+        result = await rule_storage_service.list_rules(directory)
 
         if not result["success"]:
             raise Exception(

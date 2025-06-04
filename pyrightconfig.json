@@ -1,0 +1,27 @@
+{
+    "include": [
+        "src",
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "tests/",
+        ".venv/**",
+        ".pytest_cache/**",
+    ],
+    "ignore": [
+        "tests/"
+    ],
+    "venvPath": ".",
+    "venv": ".venv",
+    "defineConstant": {
+        "DEBUG": true
+    },
+    "reportMissingImports": "warning",
+    "reportGeneralTypeIssues": "warning",
+    "reportArgumentType": "warning",
+    "reportAttributeAccessIssue": "warning",
+    "typeCheckingMode": "basic",
+    "useLibraryCodeForTypes": true,
+    "stubPath": "./typings"
+}
