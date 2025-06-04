@@ -5,7 +5,7 @@ from typing import Any, Dict
 import frontmatter
 from elasticsearch import AsyncElasticsearch
 
-from src.arclio_rules.services.rule_storage_service import RuleStorageService
+from arclio_rules.services.rule_storage_service import RuleStorageService
 
 rule_storage_service = RuleStorageService(config={})
 
@@ -72,7 +72,8 @@ class RuleIndexingService:
 
     async def _walk_and_index_directory(self, client_id: str, directory: str):
         """Recursively walk directory and index all rules."""
-        result = await rule_storage_service.list_rules(client_id, directory)
+        # TODO : Note the client ID was removed from the list rules function
+        result = await rule_storage_service.list_rules(directory)
 
         if not result["success"]:
             raise Exception(

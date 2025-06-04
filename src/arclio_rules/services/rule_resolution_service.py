@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 import frontmatter
 from pydantic import BaseModel
 
-from src.arclio_rules.services.rule_storage_service import RuleStorageService
+from arclio_rules.services.rule_storage_service import RuleStorageService
 
 rule_storage_service = RuleStorageService(config={})
 
