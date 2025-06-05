@@ -1,6 +1,6 @@
 [project]
 name = "arclio-rules"
-version = "0.4.3"
+version = "0.5.3"
 description = "Arclio-rules mcp-server created using fastmcp 🚀"
 readme = "README.md"
 license = "MIT"
