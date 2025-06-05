@@ -55,64 +55,7 @@ async def get_main_rule() -> dict:
         }
 
 
-# Dynamic resource template
-@mcp.resource("rules://{rule_id}/profile")
-def get_inhouse_rules(rule_id: int):
-    """Get in-house rules for a specific user.
-
-    Args:
-        rule_id (int): The ID of the rule to be fetched.
-
-    Returns:
-        dict: A dictionary containing the rule name, content, and status.
-    """
-    rule = get_inhouse_rule(rule_id=rule_id)
-    return {
-        "name": f"Rule:{rule_id}",
-        "content": rule["content"],
-        "status": "active",
-        "sessionId": "session_id",
-    }
-
-
-def get_inhouse_rule(rule_id: int) -> dict:
-    """Fetch the content of an in-house rule.
-
-    Args:
-        rule_id (int): The ID of the rule to be fetched.
-
-    Returns:
-        str: The content of the rule.
-    """
-    # open the file in read mode
-    with open(f"inhouse_rules/rule_{rule_id}.md", "r") as file:
-        rule = file.read()
-    return {
-        "content": rule,
-        "sessionId": "session_id",
-    }
-
-
-async def check_mcp(mcp: FastMCP):
-    """Check the MCP instance for available tools and resources.
-
-    Args:
-        mcp (FastMCP): The MCP instance to check.
-    """
-    # List the components that were created
-    tools = await mcp.get_tools()
-    resources = await mcp.get_resources()
-    templates = await mcp.get_resource_templates()
-    logger.info(f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}")  # noqa E501
-    logger.info(
-        f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # noqa E501 # type: ignore
-    )
-    logger.info(
-        f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa E501
-    )
-
-
-def use_route_names_as_operation_ids(app: FastAPI) -> None:
+def _use_route_names_as_operation_ids(app: FastAPI) -> None:
     """Simplify operation IDs so that generated API clients have simpler function names.
 
     Should be called only after all routes have been added.
@@ -122,12 +65,33 @@ def use_route_names_as_operation_ids(app: FastAPI) -> None:
             route.operation_id = route.name
 
 
-use_route_names_as_operation_ids(app)
+_use_route_names_as_operation_ids(app)
 
 
 def main():
     """Main function to run the FastMCP server."""
-    asyncio.run(check_mcp(mcp))
+
+    async def _check_mcp(mcp: FastMCP):
+        """Check the MCP instance for available tools and resources.
+
+        Args:
+            mcp (FastMCP): The MCP instance to check.
+        """
+        # List the components that were created
+        tools = await mcp.get_tools()
+        resources = await mcp.get_resources()
+        templates = await mcp.get_resource_templates()
+        logger.info(
+            f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}"
+        )  # noqa E501
+        logger.info(
+            f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # noqa E501 # type: ignore
+        )
+        logger.info(
+            f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa E501
+        )
+
+    asyncio.run(_check_mcp(mcp))
     mcp.run()
 
 

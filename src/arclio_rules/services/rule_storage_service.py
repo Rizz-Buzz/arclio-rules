@@ -121,30 +121,30 @@ class RuleStorageService:
         except Exception as e:
             return {"success": False, "error": str(e)}
 
-    # async def save_rule_content(
-    #     self,
-    #     client_name: str,
-    #     rule_path: str,
-    #     content: str,
-    #     commit_message: Optional[str] = None,
-    # ) -> Dict[str, Any]:
-    #     """Save a rule to the repository."""
-    #     try:
-    #         repo = self._ensure_repo_cloned()
-    #         file_path = Path(repo.working_dir) / "rules" / client_name / rule_path
+    async def save_rule_content(
+        self,
+        client_name: str,
+        rule_path: str,
+        content: str,
+        commit_message: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Save a rule to the repository."""
+        try:
+            repo = self._ensure_repo_cloned()
+            file_path = Path(repo.working_dir) / "rules" / client_name / rule_path
 
-    #         # Ensure parent directory exists
-    #         file_path.parent.mkdir(parents=True, exist_ok=True)
+            # Ensure parent directory exists
+            file_path.parent.mkdir(parents=True, exist_ok=True)
 
-    #         # Write the content to the file
-    #         with open(file_path, "w") as f:
-    #             f.write(content)
+            # Write the content to the file
+            with open(file_path, "w") as f:
+                f.write(content)
 
-    #         # Add, commit and push
-    #         repo.git.add(f"rules/{client_name}/{rule_path}")
-    #         repo.git.commit("-m", commit_message or f"Update {rule_path}")
-    #         repo.git.push("origin", "main")
+            # Add, commit and push
+            repo.git.add(f"rules/{client_name}/{rule_path}")
+            repo.git.commit("-m", commit_message or f"Update {rule_path}")
+            repo.git.push("origin", "main")
 
-    #         return {"success": True}
-    #     except Exception as e:
-    #         return {"success": False, "error": str(e)}
+            return {"success": True}
+        except Exception as e:
+            return {"success": False, "error": str(e)}

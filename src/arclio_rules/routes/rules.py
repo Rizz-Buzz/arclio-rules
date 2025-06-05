@@ -21,6 +21,11 @@ class ApplyRulesRequest(BaseModel):
     current_context: str
 
 
+class RuleSaveRequest(BaseModel):
+    content: str
+    commit_message: str = "Update rule content"
+
+
 # Load the main rule
 @router.post("/load_main_rule", operation_id="load_main_rule")
 async def load_main_rule():
@@ -78,82 +83,82 @@ async def list_rules(directory: str = ""):
         raise HTTPException(status_code=500, detail="Failed to list rules")
 
 
-# # Save a rule
-# @router.post("/{client_id}/{rule_path:path}", operation_id="save_rule")
-# async def save_rule(client_id: str, rule_path: str, request: RuleSaveRequest):
-#     """Save a rule to the client repository.
+# Save a rule
+@router.post("/{client_id}/{rule_path:path}", operation_id="save_rule")
+async def save_rule(client_id: str, rule_path: str, request: RuleSaveRequest):
+    """Save a rule to the client repository.
 
-#     Args:
-#         client_id (str): The ID of the client whose rule is being saved.
-#         rule_path (str): The path to save the rule in the client's repository.
-#         request (RuleSaveRequest): The request object containing the rule content
+    Args:
+        client_id (str): The ID of the client whose rule is being saved.
+        rule_path (str): The path to save the rule in the client's repository.
+        request (RuleSaveRequest): The request object containing the rule content
 
-#     Returns:
-#         dict: A dictionary containing the success status.
-#     """
-#     if not request.content:
-#         raise HTTPException(status_code=400, detail="Content is required")
+    Returns:
+        dict: A dictionary containing the success status.
+    """
+    if not request.content:
+        raise HTTPException(status_code=400, detail="Content is required")
 
-#     result = await rule_storage_service.save_rule_content(
-#         client_id, rule_path, request.content, request.commit_message
-#     )
+    result = await rule_storage_service.save_rule_content(
+        client_id, rule_path, request.content, request.commit_message
+    )
 
-#     if result["success"]:
-#         # Index the rule after saving
-#         await rule_indexing_service.index_rule(client_id, rule_path)
-#         return {"success": True}
-#     else:
-#         raise HTTPException(status_code=500, detail="Failed to save rule")
-
-
-# # Search rules
-# @router.post("/{client_id}/search", operation_id="search_rules")
-# async def search_rules(
-#     client_id: str,
-#     q: str = Query(..., description="Search query"),
-#     limit: int = Query(10, ge=1, le=100),
-# ):
-#     """Search rules.
-
-#     Args:
-#         client_id (str): The ID of the client whose rules are being searched.
-#         q (str): The search query.
-#         limit (int): The maximum number of results to return.
-
-#     Returns:
-#         dict: A dictionary containing the success status and the search results.
-#     """
-#     if not q:
-#         raise HTTPException(status_code=400, detail="Query is required")
-
-#     result = await rule_indexing_service.search_rules(client_id, q, limit)
-
-#     if result["success"]:
-#         return {"success": True, "results": result["results"]}
-#     else:
-#         raise HTTPException(status_code=500, detail="Search failed")
+    if result["success"]:
+        # Index the rule after saving
+        await rule_indexing_service.index_rule(client_id, rule_path)
+        return {"success": True}
+    else:
+        raise HTTPException(status_code=500, detail="Failed to save rule")
 
 
-# # Apply rules to context
-# @router.post("/{client_id}/apply", operation_id="apply_rules")
-# async def apply_rules(client_id: str, request: ApplyRulesRequest):
-#     """Apply rules to context.
+# Search rules
+@router.post("/{client_id}/search", operation_id="search_rules")
+async def search_rules(
+    client_id: str,
+    q: str = Query(..., description="Search query"),
+    limit: int = Query(10, ge=1, le=100),
+):
+    """Search rules.
 
-#     Args:
-#         client_id (str): The ID of the client whose rules are being applied.
-#         request (ApplyRulesRequest): The request object containing the rule paths and current context. # noqa: E501
+    Args:
+        client_id (str): The ID of the client whose rules are being searched.
+        q (str): The search query.
+        limit (int): The maximum number of results to return.
 
-#     Returns:
-#         dict: A dictionary containing the success status and the enhanced context.
-#     """  # noqa: E501
-#     if not request.rule_paths:
-#         raise HTTPException(status_code=400, detail="Rule paths array is required")
+    Returns:
+        dict: A dictionary containing the success status and the search results.
+    """
+    if not q:
+        raise HTTPException(status_code=400, detail="Query is required")
 
-#     try:
-#         enhanced_context = await rule_resolution_service.apply_rules_to_context(
-#             client_id, request.rule_paths, request.current_context
-#         )
+    result = await rule_indexing_service.search_rules(client_id, q, limit)
 
-#         return {"success": True, "context": enhanced_context}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+    if result["success"]:
+        return {"success": True, "results": result["results"]}
+    else:
+        raise HTTPException(status_code=500, detail="Search failed")
+
+
+# Apply rules to context
+@router.post("/{client_id}/apply", operation_id="apply_rules")
+async def apply_rules(client_id: str, request: ApplyRulesRequest):
+    """Apply rules to context.
+
+    Args:
+        client_id (str): The ID of the client whose rules are being applied.
+        request (ApplyRulesRequest): The request object containing the rule paths and current context. # noqa: E501
+
+    Returns:
+        dict: A dictionary containing the success status and the enhanced context.
+    """  # noqa: E501
+    if not request.rule_paths:
+        raise HTTPException(status_code=400, detail="Rule paths array is required")
+
+    try:
+        enhanced_context = await rule_resolution_service.apply_rules_to_context(
+            client_id, request.rule_paths, request.current_context
+        )
+
+        return {"success": True, "context": enhanced_context}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
