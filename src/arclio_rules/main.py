@@ -8,7 +8,7 @@ from fastmcp import FastMCP
 from loguru import logger
 
 from arclio_rules.routes.rules import router as rules_router
-from arclio_rules.services.rule_storage_service import RuleStorageService
+from arclio_rules.services.rule_fetch_service import RuleFetchService
 
 app = FastAPI(
     name="arclio-rules", description="Arclio-rules mcp-server created using fastmcp 🚀"
@@ -41,18 +41,10 @@ mcp = FastMCP.from_fastapi(app=app)
 )
 async def get_main_rule() -> dict:
     """Get the main rule of the application."""
-    rule_storage_service = RuleStorageService(config={})
-    main_rule_content = await rule_storage_service.get_rule_content(
-        client_name="", rule_path="index.md"
+    rule_fetch_service = RuleFetchService(config={})
+    return rule_fetch_service.get_rule(
+        company="", category="", rule="", is_main_rule=True
     )
-    if main_rule_content["success"]:
-        return {
-            "content": main_rule_content["content"],
-        }
-    else:
-        return {
-            "content": "Failed to get the main rule of the application.",
-        }
 
 
 def _use_route_names_as_operation_ids(app: FastAPI) -> None:

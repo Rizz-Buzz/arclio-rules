@@ -9,7 +9,7 @@ install: ## Install & sync backend dependencies
 	@echo "${GREEN}Installing backend dependencies...${RESET}"
 	source .env && \
 	uv pip install -e .
-	make sync
+	uv sync
 	@echo "${GREEN}Backend dependencies installed.${RESET}"
 
 # For Python Development
@@ -31,7 +31,7 @@ pre-commit: ## Run pre-commit checks (combines lint, type-check and format)
 run-dev: ## Run the development server using stdio
 	@echo "$(YELLOW)Starting development server using stdio...$(RESET)"
 	source .env && \
-	uv run arclio-rules
+	arclio-rules
 
 # SOPS
 init-key: ## Generate new age key and configure shell
