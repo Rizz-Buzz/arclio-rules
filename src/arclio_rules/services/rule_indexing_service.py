@@ -10,7 +10,7 @@ from arclio_rules.services.rule_fetching_service import RuleFetchingService
 
 
 class RuleIndexingService:
-    """Service to cache results of RuleFetchService operations in memory."""
+    """Service to cache results of RuleFetchingService operations in memory."""
 
     def __init__(
         self, config: Dict, max_cache_size: int = 1000, ttl_seconds: int = 300
@@ -18,7 +18,7 @@ class RuleIndexingService:
         """Initialize the in-memory cache service.
 
         Args:
-            config (Dict): Configuration dictionary for RuleFetchService.
+            config (Dict): Configuration dictionary for RuleFetchingService.
             max_cache_size (int): Maximum number of items to store in cache (LRU).
             ttl_seconds (int): Time-to-live for cached items in seconds (default: 5 minutes).
         """  # noqa: E501
@@ -28,12 +28,15 @@ class RuleIndexingService:
         self.lock = threading.Lock()
         self.fetcher = RuleFetchingService(config)
         self.access_times: Dict[str, float] = {}  # Track access times for LRU
+        logger.info(
+            f"Initialized RuleIndexingService with max_cache_size={max_cache_size}, ttl_seconds={ttl_seconds}"  # noqa: E501
+        )
 
     def _generate_cache_key(self, method: str, **params: Any) -> str:
         """Generate a unique cache key based on method name and parameters.
 
         Args:
-            method (str): The name of the RuleFetchService method (e.g., 'list_all_companies').
+            method (str): The name of the RuleFetchingService method (e.g., 'list_all_companies').
             **params: Keyword arguments for the method (e.g., company, category, rule).
 
         Returns:
@@ -41,7 +44,11 @@ class RuleIndexingService:
         """  # noqa: E501
         params_str = "&".join(f"{k}={str(v)}" for k, v in sorted(params.items()))
         key_input = f"{method}:{params_str}"
-        return hashlib.sha256(key_input.encode()).hexdigest()
+        cache_key = hashlib.sha256(key_input.encode()).hexdigest()
+        logger.debug(
+            f"Generated cache key: {cache_key} for method={method}, params={params}"
+        )
+        return cache_key
 
     def _is_cache_valid(self, cache_entry: Dict[str, Any]) -> bool:
         """Check if a cache entry is still valid based on TTL.
@@ -52,16 +59,18 @@ class RuleIndexingService:
         Returns:
             bool: True if the entry is valid, False if expired.
         """
-        return time.time() - cache_entry["timestamp"] < self.ttl_seconds
+        is_valid = time.time() - cache_entry["timestamp"] < self.ttl_seconds
+        logger.debug(
+            f"Cache entry valid: {is_valid}, age={time.time() - cache_entry['timestamp']} seconds"
+        )
+        return is_valid
 
     def _evict_oldest(self):
         """Evict the least recently used item if cache is full."""
         if len(self.cache) >= self.max_cache_size:
-            oldest_key = min(
-                self.access_times,
-                key=self.access_times.get,  # type: ignore
-            )
+            oldest_key = min(self.access_times, key=self.access_times.get)
             with self.lock:
+                logger.info(f"Evicting oldest cache entry: {oldest_key}")
                 self.cache.pop(oldest_key, None)
                 self.access_times.pop(oldest_key, None)
 
@@ -72,7 +81,7 @@ class RuleIndexingService:
 
         Args:
             method (str): The name of the method to cache (e.g., 'list_all_companies').
-            fetch_func (callable): The RuleFetchService method to call on cache miss.
+            fetch_func (callable): The RuleFetchingService method to call on cache miss.
             **params: Parameters to pass to the fetch function and for cache key generation.
 
         Returns:
@@ -82,12 +91,13 @@ class RuleIndexingService:
 
         with self.lock:
             if cache_key in self.cache and self._is_cache_valid(self.cache[cache_key]):
-                logger.info(f"Cache hit for {method} with params {params}")
+                logger.info(
+                    f"Cache hit for {method} with params {params}, key={cache_key}"
+                )
                 self.access_times[cache_key] = time.time()
                 return self.cache[cache_key]["data"]
 
-        # Cache miss or expired
-        logger.info(f"Cache miss for {method} with params {params}")
+        logger.info(f"Cache miss for {method} with params {params}, key={cache_key}")
         try:
             data = fetch_func(**params)
         except HTTPException as e:
@@ -99,6 +109,7 @@ class RuleIndexingService:
 
         with self.lock:
             self._evict_oldest()
+            logger.debug(f"Caching data for {method} with key={cache_key}")
             self.cache[cache_key] = {"data": data, "timestamp": time.time()}
             self.access_times[cache_key] = time.time()
 
@@ -173,12 +184,14 @@ class RuleIndexingService:
         """Invalidate a specific cache entry.
 
         Args:
-            method (str): The name of the method to invalidate (e.g., 'list_all_companies').
+            method (str): The name of the method to invalidate (e.g., 'list_all_companies'). # noqa: E501
             **params: Parameters used to generate the cache key.
-        """  # noqa: E501
+        """
         cache_key = self._generate_cache_key(method, **params)
         with self.lock:
             if cache_key in self.cache:
-                logger.info(f"Invalidating cache for {method} with params {params}")
+                logger.info(
+                    f"Invalidating cache for {method} with params {params}, key={cache_key}"  # noqa: E501
+                )
                 self.cache.pop(cache_key, None)
                 self.access_times.pop(cache_key, None)

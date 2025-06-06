@@ -1,7 +1,7 @@
 import asyncio
 import os
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from fastmcp import FastMCP
@@ -31,21 +31,25 @@ app.include_router(rules_router)
 mcp = FastMCP.from_fastapi(app=app)
 
 
-@mcp.resource(
-    uri="rule://main-rule",
-    name="MainRule",
-    description="Provides the main rule of the application.",
-    mime_type="application/json",
-    tags={"rules", "main"},
-)
-async def get_main_rule() -> dict:
-    """Get the main rule of the application."""
-    indexer = RuleIndexingService(config={})
-    return indexer.get_rule(company="", category="", rule="", is_main_rule=True)
+# def get_indexer():
+#     """Provide a singleton RuleIndexingService instance."""
+#     return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=300)
+
+
+# @mcp.resource(
+#     uri="rule://main-rule",
+#     name="MainRule",
+#     description="Provides the main rule of the application.",
+#     mime_type="application/json",
+#     tags={"rules", "main"},
+# )
+# async def get_main_rule(indexer: RuleIndexingService = Depends(get_indexer)) -> dict:
+#     """Get the main rule of the application."""
+#     return indexer.get_rule(company="", category="", rule="", is_main_rule=True)
 
 
 def _use_route_names_as_operation_ids(app: FastAPI) -> None:
-    """Simplify operation IDs so that generated API clients have simpler function names."""  #  noqa: E501
+    """Simplify operation IDs so that generated API clients have simpler function names."""  # noqa: E501
     for route in app.routes:
         if isinstance(route, APIRoute):
             route.operation_id = route.name
@@ -66,7 +70,7 @@ def main():
             f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}"
         )
         logger.info(
-            f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  #  pyright: ignore[reportCallIssue, reportArgumentType] # noqa : E501
+            f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # pyright: ignore[reportCallIssue, reportArgumentType]  # noqa: E501
         )
         logger.info(
             f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa: E501

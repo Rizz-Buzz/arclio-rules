@@ -33,7 +33,6 @@ class RuleFetchingService:
         }
         self.config = config
 
-    # In-memory cache for GitHub API responses
     @lru_cache(maxsize=1000)
     def fetch_github_content(self, path: str) -> Dict:
         """Fetch content from GitHub API with error handling.
