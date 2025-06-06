@@ -8,7 +8,7 @@ from fastmcp import FastMCP
 from loguru import logger
 
 from arclio_rules.routes.rules import router as rules_router
-from arclio_rules.services.rule_fetch_service import RuleFetchService
+from arclio_rules.services.rule_indexing_service import RuleIndexingService
 
 app = FastAPI(
     name="arclio-rules", description="Arclio-rules mcp-server created using fastmcp 🚀"
@@ -31,7 +31,6 @@ app.include_router(rules_router)
 mcp = FastMCP.from_fastapi(app=app)
 
 
-# create another mcp resource
 @mcp.resource(
     uri="rule://main-rule",
     name="MainRule",
@@ -41,17 +40,12 @@ mcp = FastMCP.from_fastapi(app=app)
 )
 async def get_main_rule() -> dict:
     """Get the main rule of the application."""
-    rule_fetch_service = RuleFetchService(config={})
-    return rule_fetch_service.get_rule(
-        company="", category="", rule="", is_main_rule=True
-    )
+    indexer = RuleIndexingService(config={})
+    return indexer.get_rule(company="", category="", rule="", is_main_rule=True)
 
 
 def _use_route_names_as_operation_ids(app: FastAPI) -> None:
-    """Simplify operation IDs so that generated API clients have simpler function names.
-
-    Should be called only after all routes have been added.
-    """
+    """Simplify operation IDs so that generated API clients have simpler function names."""  #  noqa: E501
     for route in app.routes:
         if isinstance(route, APIRoute):
             route.operation_id = route.name
@@ -64,23 +58,18 @@ def main():
     """Main function to run the FastMCP server."""
 
     async def _check_mcp(mcp: FastMCP):
-        """Check the MCP instance for available tools and resources.
-
-        Args:
-            mcp (FastMCP): The MCP instance to check.
-        """
-        # List the components that were created
+        """Check the MCP instance for available tools and resources."""
         tools = await mcp.get_tools()
         resources = await mcp.get_resources()
         templates = await mcp.get_resource_templates()
         logger.info(
             f"{len(tools)} Tool(s): {', '.join([t.name for t in tools.values()])}"
-        )  # noqa E501
-        logger.info(
-            f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  # noqa E501 # type: ignore
         )
         logger.info(
-            f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa E501
+            f"{len(resources)} Resource(s): {', '.join([r.name for r in resources.values()])}"  #  pyright: ignore[reportCallIssue, reportArgumentType] # noqa : E501
+        )
+        logger.info(
+            f"{len(templates)} Resource Template(s): {', '.join([t.name for t in templates.values()])}"  # noqa: E501
         )
 
     asyncio.run(_check_mcp(mcp))

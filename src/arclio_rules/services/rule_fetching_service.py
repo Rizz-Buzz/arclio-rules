@@ -1,36 +1,14 @@
 import base64
 import os
 from functools import lru_cache
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import requests
 from fastapi import HTTPException
 from loguru import logger
-from pydantic import BaseModel
 
 
-class RuleContent(BaseModel):
-    company_name: str
-    category_name: str
-    rule_name: str
-    content: str
-
-
-class RuleSaveRequest(BaseModel):
-    content: str
-    commit_message: Optional[str] = None
-
-
-class RuleMetadata(BaseModel):
-    description: Optional[str] = None
-    version: str = "1.0.0"
-    owner: Optional[str] = None
-    last_updated: Optional[str] = None
-    applies_to: Optional[List[str]] = None
-    dependencies: Optional[List[str]] = None
-
-
-class RuleFetchService:
+class RuleFetchingService:
     """Service to fetch and manage rules from a GitHub repository."""
 
     def __init__(self, config):
