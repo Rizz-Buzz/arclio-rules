@@ -10,7 +10,7 @@ Arclio Rules is built with Python 3.12+ and leverages modern async capabilities 
 
 - FastAPI-based REST API
 - Built on FastMCP framework for efficient rule processing
-- Elasticsearch integration for rule storage and querying
+- Redis integration for rule indexing/storage and querying
 - Git integration for version control of rules
 - Support for both session-based and stateless operation modes
 - Frontmatter parsing capabilities
@@ -120,6 +120,9 @@ Add these two configuration JSON templates to be able to add arclio-rules to Arc
         "HOST": "{{host}}",
         "LOG_LEVEL": "{{log_level}}",
         "ENVIRONMENT": "{{environment}}"
+        "REDIS_HOST": "{{redis_host}}"
+        "REDIS_PORT": "{{redis_port}}"
+        "REDIS_PASSWORD": "{{redis_password}}"
       }
     }
   }
@@ -174,6 +177,21 @@ Add these two configuration JSON templates to be able to add arclio-rules to Arc
       "title": "Environment",
       "type": "text",
       "field": "environment"
+    },
+    {
+      "title": "REDIS_HOST",
+      "type": "text",
+      "field": "redis_host"
+    },
+    {
+      "title": "REDIS_PORT",
+      "type": "text",
+      "field": "redis_port"
+    },
+    {
+      "title": "REDIS_PASSWORD",
+      "type": "password",
+      "field": "redis_password"
     }
   ]
 }
@@ -278,7 +296,7 @@ The project enforces specific linting rules through Ruff, including:
 Key dependencies include:
 - `fastapi`: Web framework
 - `fastmcp`: MCP framework integration
-- `elasticsearch`: Search and storage
+- `redis`: Search and storage
 - `aiohttp`: Async HTTP client
 - `pydantic`: Data validation
 - `uvicorn`: ASGI server
