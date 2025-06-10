@@ -90,7 +90,7 @@ class RuleIndexingService:
                 logger.info(
                     f"Cache hit for {method} with params {params}, key={cache_key}"
                 )
-                return json.loads(cached_data)
+                return json.loads(cached_data)  # pyright: ignore[reportArgumentType]  # noqa: E501
         except redis.RedisError as e:
             logger.error(f"Redis error while checking cache for {cache_key}: {str(e)}")
             # Fall through to fetch on Redis error
@@ -110,7 +110,7 @@ class RuleIndexingService:
         try:
             # Check approximate cache size
             cache_size = self.redis_client.dbsize()
-            if cache_size >= self.max_cache_size:
+            if cache_size >= self.max_cache_size:  # pyright: ignore[reportArgumentType]  # noqa: E501
                 logger.warning(
                     f"Redis cache size {cache_size} reached max_cache_size={self.max_cache_size}. Relying on LRU eviction."  # noqa: E501
                 )
