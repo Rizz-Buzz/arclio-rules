@@ -1,14 +1,15 @@
 import asyncio
 import os
 
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 from fastmcp import FastMCP
 from loguru import logger
 
 from arclio_rules.routes.rules import router as rules_router
-from arclio_rules.services.rule_indexing_service import RuleIndexingService
+
+# from arclio_rules.services.rule_indexing_service import RuleIndexingService
 
 app = FastAPI(
     name="arclio-rules", description="Arclio-rules mcp-server created using fastmcp 🚀"
@@ -33,7 +34,7 @@ mcp = FastMCP.from_fastapi(app=app)
 
 # def get_indexer():
 #     """Provide a singleton RuleIndexingService instance."""
-#     return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=300)
+#     return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=3600)
 
 
 # @mcp.resource(

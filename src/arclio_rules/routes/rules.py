@@ -1,13 +1,19 @@
 from fastapi import APIRouter, Depends
 
 from arclio_rules.services.rule_indexing_service import RuleIndexingService
+from arclio_rules.services.rule_saving_service import RuleSavingService
 
 router = APIRouter(prefix="/api/rules")
 
 
 def get_indexer():
     """Dependency to get the RuleIndexingService instance."""
-    return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=300)
+    return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=3600)
+
+
+def get_saver():
+    """Dependency to get the RuleSavingService instance."""
+    return RuleSavingService()
 
 
 @router.post("/rules", operation_id="list_companies")
@@ -98,3 +104,26 @@ async def get_main_rule(indexer: RuleIndexingService = Depends(get_indexer)):
         dict: A dictionary containing the rule content.
     """
     return indexer.get_rule(company="", category="", rule="", is_main_rule=True)
+
+
+@router.put("/rules/{company}/{category}/{rule}", operation_id="save_rule")
+async def save_rule(
+    company: str,
+    category: str,
+    rule: str,
+    content: str,
+    saver: RuleSavingService = Depends(get_saver),
+):
+    """Save a rule to GitHub.
+
+    Args:
+        company (str): The name of the company whose rule is being saved.
+        category (str): The category of the rule.
+        rule (str): The name of the rule.
+        content (str): The content of the rule.
+        saver (RuleSavingService): The service to save the rule.
+
+    Returns:
+        dict: A dictionary containing the status and path of the saved rule.
+    """
+    return saver.save_rule(company, category, rule, content)

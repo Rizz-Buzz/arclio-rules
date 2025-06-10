@@ -26,7 +26,7 @@ class RuleFetchingService:
         self.rules_repo_name = os.environ.get("RULES_REPO_NAME")
         if not self.rules_repo_name:
             raise ValueError("Rules repo name is not set in environment variables.")
-        self.gh_rules_repo = f"https://api.github.com/repos/{self.github_org}/{self.rules_repo_name}/contents"
+        self.gh_rules_repo = f"https://api.github.com/repos/{self.github_org}/{self.rules_repo_name}/contents"  # noqa: E501
         self.headers = {
             "Authorization": f"token {self.github_token}",
             "Accept": "application/vnd.github.v3+json",
