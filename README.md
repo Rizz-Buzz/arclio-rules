@@ -119,9 +119,9 @@ Add these two configuration JSON templates to be able to add arclio-rules to Arc
         "PORT": "{{port}}",
         "HOST": "{{host}}",
         "LOG_LEVEL": "{{log_level}}",
-        "ENVIRONMENT": "{{environment}}"
-        "REDIS_HOST": "{{redis_host}}"
-        "REDIS_PORT": "{{redis_port}}"
+        "ENVIRONMENT": "{{environment}}",
+        "REDIS_HOST": "{{redis_host}}",
+        "REDIS_PORT": "{{redis_port}}",
         "REDIS_PASSWORD": "{{redis_password}}"
       }
     }
