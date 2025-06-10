@@ -1,159 +1,129 @@
-from typing import List
-
-from fastapi import APIRouter, HTTPException
-from loguru import logger
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
 
 from arclio_rules.services.rule_indexing_service import RuleIndexingService
-from arclio_rules.services.rule_resolution_service import RuleResolutionService
-from arclio_rules.services.rule_storage_service import (
-    RuleStorageService,
-)
+from arclio_rules.services.rule_saving_service import RuleSavingService
 
 router = APIRouter(prefix="/api/rules")
-rule_storage_service = RuleStorageService(config={})
-rule_indexing_service = RuleIndexingService(config={})
-rule_resolution_service = RuleResolutionService(config={})
 
 
-class ApplyRulesRequest(BaseModel):
-    rule_paths: List[str]
-    current_context: str
+def get_indexer():
+    """Dependency to get the RuleIndexingService instance."""
+    return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=3600)
 
 
-# Load the main rule
-@router.post("/load_main_rule", operation_id="load_main_rule")
-async def load_main_rule():
-    """Load the main rule from the client repository.
-
-    Returns:
-        dict: A dictionary containing the success status and the rule content.
-    """
-    result = await rule_storage_service.get_rule_content(
-        client_name="", rule_path="index.mdc"
-    )
-    if result["success"]:
-        return {"success": True, "content": result["content"]}
-    else:
-        logger.error(f"Failed to get rule: {result.get('error')}")
-        raise HTTPException(status_code=404, detail="Rule not found")
+def get_saver():
+    """Dependency to get the RuleSavingService instance."""
+    return RuleSavingService()
 
 
-@router.post("/{client_name}/{rule_path:path}", operation_id="load_rule")
-async def load_rule(client_name: str, rule_path: str):
-    """Load a rule from the client repository.
+@router.post("/rules", operation_id="list_companies")
+async def list_companies(indexer: RuleIndexingService = Depends(get_indexer)):
+    """List all companies.
 
     Args:
-        client_name (str): The name of the client whose rule is being fetched.
-        rule_path (str): The path to the rule in the client's repository.
+        indexer (RuleIndexingService): The indexing service to fetch the companies.
 
     Returns:
-        dict: A dictionary containing the success status and the rule content.
+        dict: A dictionary containing a list of all companies.
     """
-    result = await rule_storage_service.get_rule_content(client_name, rule_path)
-
-    if result["success"]:
-        return {"success": True, "content": result["content"]}
-    else:
-        logger.error(f"Failed to get rule: {result.get('error')}")
-        raise HTTPException(status_code=404, detail="Rule not found")
+    result = indexer.list_all_companies()
+    return {"companies": result}
 
 
-# List rules in a directory
-@router.post("/{client_name}/{directory:path}", operation_id="list_rules")
-async def list_rules(directory: str = ""):
-    """List rules in a directory.
+@router.post("/rules/{company}", operation_id="get_company_categories")
+async def get_company_categories(
+    company: str, indexer: RuleIndexingService = Depends(get_indexer)
+):
+    """List categories for a company.
 
     Args:
-        directory (str): The directory to list rules from.
+        company (str): The name of the company whose categories are being listed.
+        indexer (RuleIndexingService): The indexing service to fetch the categories.
 
     Returns:
-        dict: A dictionary containing the success status and the rules.
+        dict: A dictionary containing the company name and a list of categories.
     """
-    result = await rule_storage_service.list_rules(directory)
-
-    if result["success"]:
-        return {"success": True, "rules": result["rules"]}
-    else:
-        raise HTTPException(status_code=500, detail="Failed to list rules")
-
-
-# # Save a rule
-# @router.post("/{client_id}/{rule_path:path}", operation_id="save_rule")
-# async def save_rule(client_id: str, rule_path: str, request: RuleSaveRequest):
-#     """Save a rule to the client repository.
-
-#     Args:
-#         client_id (str): The ID of the client whose rule is being saved.
-#         rule_path (str): The path to save the rule in the client's repository.
-#         request (RuleSaveRequest): The request object containing the rule content
-
-#     Returns:
-#         dict: A dictionary containing the success status.
-#     """
-#     if not request.content:
-#         raise HTTPException(status_code=400, detail="Content is required")
-
-#     result = await rule_storage_service.save_rule_content(
-#         client_id, rule_path, request.content, request.commit_message
-#     )
-
-#     if result["success"]:
-#         # Index the rule after saving
-#         await rule_indexing_service.index_rule(client_id, rule_path)
-#         return {"success": True}
-#     else:
-#         raise HTTPException(status_code=500, detail="Failed to save rule")
+    result = indexer.list_company_categories(company)
+    return {
+        "company": company,
+        "categories": result,
+    }
 
 
-# # Search rules
-# @router.post("/{client_id}/search", operation_id="search_rules")
-# async def search_rules(
-#     client_id: str,
-#     q: str = Query(..., description="Search query"),
-#     limit: int = Query(10, ge=1, le=100),
-# ):
-#     """Search rules.
+@router.post("/rules/{company}/{category}", operation_id="get_category_rules")
+async def get_category_rules(
+    company: str, category: str, indexer: RuleIndexingService = Depends(get_indexer)
+):
+    """List rules in a category.
 
-#     Args:
-#         client_id (str): The ID of the client whose rules are being searched.
-#         q (str): The search query.
-#         limit (int): The maximum number of results to return.
+    Args:
+        company (str): The name of the company whose category rules are being listed.
+        category (str): The name of the category whose rules are being listed.
+        indexer (RuleIndexingService): The indexing service to fetch the rules.
 
-#     Returns:
-#         dict: A dictionary containing the success status and the search results.
-#     """
-#     if not q:
-#         raise HTTPException(status_code=400, detail="Query is required")
-
-#     result = await rule_indexing_service.search_rules(client_id, q, limit)
-
-#     if result["success"]:
-#         return {"success": True, "results": result["results"]}
-#     else:
-#         raise HTTPException(status_code=500, detail="Search failed")
+    Returns:
+        dict: A dictionary containing the company name, category name, and a list of rules in that category.
+    """  # noqa: E501
+    result = indexer.list_category_rules(company, category)
+    return {
+        "company": company,
+        "category": category,
+        "rules": result,
+    }
 
 
-# # Apply rules to context
-# @router.post("/{client_id}/apply", operation_id="apply_rules")
-# async def apply_rules(client_id: str, request: ApplyRulesRequest):
-#     """Apply rules to context.
+@router.post("/rules/{company}/{category}/{rule}", operation_id="get_rule")
+async def get_rule(
+    company: str,
+    category: str,
+    rule: str,
+    indexer: RuleIndexingService = Depends(get_indexer),
+):
+    """Fetch a specific rule.
 
-#     Args:
-#         client_id (str): The ID of the client whose rules are being applied.
-#         request (ApplyRulesRequest): The request object containing the rule paths and current context. # noqa: E501
+    Args:
+        company (str): The name of the company whose rule is being fetched.
+        category (str): The category of the rule.
+        rule (str): The name of the rule.
+        indexer (RuleIndexingService): The indexing service to fetch the rule.
 
-#     Returns:
-#         dict: A dictionary containing the success status and the enhanced context.
-#     """  # noqa: E501
-#     if not request.rule_paths:
-#         raise HTTPException(status_code=400, detail="Rule paths array is required")
+    Returns:
+        dict: A dictionary containing the rule content.
+    """
+    return indexer.get_rule(company, category, rule)
 
-#     try:
-#         enhanced_context = await rule_resolution_service.apply_rules_to_context(
-#             client_id, request.rule_paths, request.current_context
-#         )
 
-#         return {"success": True, "context": enhanced_context}
-#     except Exception as e:
-#         raise HTTPException(status_code=500, detail=str(e))
+@router.post("/main_rule", operation_id="get_main_rule")
+async def get_main_rule(indexer: RuleIndexingService = Depends(get_indexer)):
+    """Fetch the main rule.
+
+    Args:
+        indexer (RuleIndexingService): The indexing service to fetch the main rule.
+
+    Returns:
+        dict: A dictionary containing the rule content.
+    """
+    return indexer.get_rule(company="", category="", rule="", is_main_rule=True)
+
+
+@router.put("/rules/{company}/{category}/{rule}", operation_id="save_rule")
+async def save_rule(
+    company: str,
+    category: str,
+    rule: str,
+    content: str,
+    saver: RuleSavingService = Depends(get_saver),
+):
+    """Save a rule to GitHub.
+
+    Args:
+        company (str): The name of the company whose rule is being saved.
+        category (str): The category of the rule.
+        rule (str): The name of the rule.
+        content (str): The content of the rule.
+        saver (RuleSavingService): The service to save the rule.
+
+    Returns:
+        dict: A dictionary containing the status and path of the saved rule.
+    """
+    return saver.save_rule(company, category, rule, content)

@@ -1,6 +1,6 @@
 [project]
 name = "arclio-rules"
-version = "0.4.3"
+version = "0.5.4"
 description = "Arclio-rules mcp-server created using fastmcp 🚀"
 readme = "README.md"
 license = "MIT"
@@ -21,6 +21,8 @@ dependencies = [
     "gitpython>=3.1.44",
     "loguru>=0.7.3",
     "pydantic>=2.11.4",
+    "redis>=6.2.0",
+    "twine>=6.1.0",
     "uvicorn>=0.34.2",
 ]
 
