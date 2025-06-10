@@ -65,6 +65,9 @@ Required Environment Variables:
 GITHUB_TOKEN="add your GH PAT here"
 GITHUB_ORG="add your GH Organization here"
 REPO_NAME="add your repo that holds the rules here"
+REDIS_HOST="localhost"
+REDIS_PORT="6379"
+REDIS_PASSWORD="add your password here if there is one"
 ```
 
 Default Environmental Variables (No need to modify):
