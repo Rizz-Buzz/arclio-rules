@@ -110,7 +110,7 @@ class RuleIndexingService:
         try:
             # Check approximate cache size
             cache_size = self.redis_client.dbsize()
-            if cache_size >= self.max_cache_size:  # pyright: ignore[reportArgumentType]  # noqa: E501
+            if int(cache_size) >= self.max_cache_size:  # type: ignore[reportArgumentType]  # noqa: E501
                 logger.warning(
                     f"Redis cache size {cache_size} reached max_cache_size={self.max_cache_size}. Relying on LRU eviction."  # noqa: E501
                 )
