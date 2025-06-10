@@ -115,7 +115,7 @@ Add these two configuration JSON templates to be able to add arclio-rules to Arc
       "env": {
         "GITHUB_TOKEN": "{{github_token}}",
         "GITHUB_ORG": "{{github_org}}",
-        "REPO_NAME": "{{repo_name}}",
+        "RULES_REPO_NAME": "{{rules_repo_name}}",
         "PORT": "{{port}}",
         "HOST": "{{host}}",
         "LOG_LEVEL": "{{log_level}}",
@@ -151,12 +151,12 @@ Add these two configuration JSON templates to be able to add arclio-rules to Arc
     {
       "title": "Repository Name",
       "type": "text",
-      "field": "repo_name"
+      "field": "rules_repo_name"
     },
     {
       "title": "Server Configuration",
       "type": "instructions",
-      "content": "Configure server settings (optional - defaults will be used if not specified)"
+      "content": "Configure server settings"
     },
     {
       "title": "Application Port",
