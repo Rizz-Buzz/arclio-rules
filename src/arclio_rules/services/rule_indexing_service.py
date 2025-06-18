@@ -1,7 +1,7 @@
 import hashlib
 import json
 import os
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable
 
 import redis
 from fastapi import HTTPException
@@ -13,19 +13,16 @@ from arclio_rules.services.rule_fetching_service import RuleFetchingService
 class RuleIndexingService:
     """Service to cache results of RuleFetchingService operations in Redis."""
 
-    def __init__(
-        self, config: Dict, max_cache_size: int = 1000, ttl_seconds: int = 3600
-    ):
+    def __init__(self, max_cache_size: int = 1000, ttl_seconds: int = 3600):
         """Initialize the Redis cache service.
 
         Args:
-            config (Dict): Configuration dictionary for RuleFetchingService.
             max_cache_size (int): Maximum number of items to store in cache (enforced by Redis LRU).
             ttl_seconds (int): Time-to-live for cached items in seconds (default: 1 hour).
         """  # noqa: E501
         self.max_cache_size = max_cache_size
         self.ttl_seconds = ttl_seconds
-        self.fetcher = RuleFetchingService(config)
+        self.fetcher = RuleFetchingService()
 
         # Initialize Redis connection
         redis_host = os.environ.get("REDIS_HOST", "localhost")
@@ -90,7 +87,9 @@ class RuleIndexingService:
                 logger.info(
                     f"Cache hit for {method} with params {params}, key={cache_key}"
                 )
-                return json.loads(cached_data)  # pyright: ignore[reportArgumentType]  # noqa: E501
+                return json.loads(
+                    cached_data
+                )  # pyright: ignore[reportArgumentType]  # noqa: E501
         except redis.RedisError as e:
             logger.error(f"Redis error while checking cache for {cache_key}: {str(e)}")
             # Fall through to fetch on Redis error
@@ -126,24 +125,24 @@ class RuleIndexingService:
 
         return data
 
-    def list_all_companies(self) -> List[str]:
+    def list_all_companies(self) -> list[str]:
         """List all company directories under rules/, with caching.
 
         Returns:
-            List[str]: A list of company names.
+            list[str]: A list of company names.
         """
         return self._get_cached_or_fetch(
             method="list_all_companies", fetch_func=self.fetcher.list_all_companies
         )
 
-    def list_company_categories(self, company: str) -> List[str]:
+    def list_company_categories(self, company: str) -> list[str]:
         """List all categories for a specific company, with caching.
 
         Args:
             company (str): The name of the company.
 
         Returns:
-            List[str]: A a list of category names.
+            list[str]: A a list of category names.
         """
         return self._get_cached_or_fetch(
             method="list_company_categories",
@@ -151,7 +150,7 @@ class RuleIndexingService:
             company=company,
         )
 
-    def list_category_rules(self, company: str, category: str) -> List[str]:
+    def list_category_rules(self, company: str, category: str) -> list[str]:
         """List all .mdc rules in a specific company category, with caching.
 
         Args:
@@ -159,7 +158,7 @@ class RuleIndexingService:
             category (str): The name of the category.
 
         Returns:
-            List[str]: A list of rule names (without .mdc extension).
+            list[str]: A list of rule names (without .mdc extension).
         """
         return self._get_cached_or_fetch(
             method="list_category_rules",
@@ -170,7 +169,7 @@ class RuleIndexingService:
 
     def get_rule(
         self, company: str, category: str, rule: str, is_main_rule: bool = False
-    ) -> Dict:
+    ) -> dict:
         """Fetch the content of a specific .mdc rule file, with caching.
 
         Args:
@@ -180,7 +179,7 @@ class RuleIndexingService:
             is_main_rule (bool): Whether the rule is the main rule (index.mdc).
 
         Returns:
-            Dict: A dictionary containing the rule content and metadata.
+            dict: A dictionary containing the rule content and metadata.
         """
         return self._get_cached_or_fetch(
             method="get_rule",

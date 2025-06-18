@@ -1,6 +1,5 @@
 import base64
 import os
-from typing import Dict, Optional
 
 import requests
 from fastapi import HTTPException
@@ -27,14 +26,14 @@ class RuleSavingService:
             "Accept": "application/vnd.github.v3+json",
         }
 
-    def _get_file_sha(self, path: str) -> Optional[str]:
+    def _get_file_sha(self, path: str) -> str | None:
         """Get the SHA of an existing file if it exists.
 
         Args:
             path (str): The path to the file in the GitHub repository.
 
         Returns:
-            Optional[str]: The SHA of the file if it exists, None otherwise.
+            str | None: The SHA of the file if it exists, None otherwise.
         """
         try:
             url = f"{self.gh_rules_repo}/{path}"
@@ -47,7 +46,7 @@ class RuleSavingService:
 
     def save_rule(
         self, company: str, category: str, rule: str, content: str
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Save a rule to GitHub.
 
         Args:
@@ -57,7 +56,7 @@ class RuleSavingService:
             content (str): The content of the rule file.
 
         Returns:
-            Dict[str, str]: A dictionary containing the status and path of the saved rule.
+            dict[str, str]: A dictionary containing the status and path of the saved rule.
 
         Raises:
             HTTPException: If there's an error saving the rule.

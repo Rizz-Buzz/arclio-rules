@@ -1,7 +1,6 @@
 import base64
 import os
 from functools import lru_cache
-from typing import Dict, List
 
 import requests
 from fastapi import HTTPException
@@ -11,12 +10,8 @@ from loguru import logger
 class RuleFetchingService:
     """Service to fetch and manage rules from a GitHub repository."""
 
-    def __init__(self, config):
-        """Initialize the RuleFetchService with configuration parameters.
-
-        Args:
-            config (dict): Configuration dictionary containing necessary parameters.
-        """
+    def __init__(self):
+        """Initialize the RuleFetchService."""
         self.github_token = os.environ.get("GITHUB_TOKEN")
         if not self.github_token:
             raise ValueError("GitHub token is not set in environment variables.")
@@ -31,17 +26,16 @@ class RuleFetchingService:
             "Authorization": f"token {self.github_token}",
             "Accept": "application/vnd.github.v3+json",
         }
-        self.config = config
 
     @lru_cache(maxsize=1000)
-    def fetch_github_content(self, path: str) -> Dict:
+    def fetch_github_content(self, path: str) -> dict:
         """Fetch content from GitHub API with error handling.
 
         Args:
             path (str): The path to the content in the GitHub repository.
 
         Returns:
-            Dict: The JSON response from the GitHub API.
+            dict: The JSON response from the GitHub API.
         """
         try:
             url = f"{self.gh_rules_repo}/{path}"
@@ -59,11 +53,11 @@ class RuleFetchingService:
             logger.error(f"Network error while fetching {path}: {str(e)}")
             raise HTTPException(status_code=500, detail=f"Network error: {str(e)}")
 
-    def list_all_companies(self) -> List[str]:
+    def list_all_companies(self) -> list[str]:
         """List all company directories under rules/.
 
         Returns:
-            List[str]: A list of company names (directory names) under rules/.
+            list[str]: A list of company names (directory names) under rules/.
         """
         try:
             content = self.fetch_github_content("rules")
@@ -79,14 +73,14 @@ class RuleFetchingService:
             logger.error(f"Error listing companies: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to list companies")
 
-    def list_company_categories(self, company: str) -> List[str]:
+    def list_company_categories(self, company: str) -> list[str]:
         """List all categories for a specific company.
 
         Args:
             company (str): The name of the company whose categories are being listed.
 
         Returns:
-            List[str]: A list of category names for the specified company.
+            list[str]: A list of category names for the specified company.
         """
         path = f"rules/{company}"
         try:
@@ -105,7 +99,7 @@ class RuleFetchingService:
                 status_code=404, detail=f"Failed to list categories for {company}"
             )
 
-    def list_category_rules(self, company: str, category: str) -> List[str]:
+    def list_category_rules(self, company: str, category: str) -> list[str]:
         """List all .mdc rules in a specific company category.
 
         Args:
@@ -113,7 +107,7 @@ class RuleFetchingService:
             category (str): The name of the category whose rules are being listed.
 
         Returns:
-            List[str]: A list of rule names (without .mdc extension) in the specified category.
+            list[str]: A list of rule names (without .mdc extension) in the specified category.
         """  # noqa: E501
         path = f"rules/{company}/{category}"
         try:
@@ -153,7 +147,7 @@ class RuleFetchingService:
                 If True, fetches from rules/index.mdc.
 
         Returns:
-            Dict: A dictionary containing the rule content and metadata.
+            dict: A dictionary containing the rule content and metadata.
         """
         try:
             if is_main_rule:

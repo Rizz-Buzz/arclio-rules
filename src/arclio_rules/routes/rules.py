@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/rules")
 
 def get_indexer():
     """Dependency to get the RuleIndexingService instance."""
-    return RuleIndexingService(config={}, max_cache_size=1000, ttl_seconds=3600)
+    return RuleIndexingService(max_cache_size=1000, ttl_seconds=3600)
 
 
 def get_saver():
