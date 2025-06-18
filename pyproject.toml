@@ -1,6 +1,6 @@
 [project]
 name = "arclio-rules"
-version = "0.5.4"
+version = "0.5.6"
 description = "Arclio-rules mcp-server created using fastmcp 🚀"
 readme = "README.md"
 license = "MIT"
@@ -27,8 +27,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Fisseha-Estifanos/arclio-rules"
-Repository = "https://github.com/Fisseha-Estifanos/arclio-rules.git"
+Homepage = "https://github.com/Rizz-Buzz/arclio-rules"
+Repository = "https://github.com/Rizz-Buzz/arclio-rules.git"
+Documentation = "https://github.com/Rizz-Buzz/arclio-rules/blob/main/README.md"
+Issues = "https://github.com/Rizz-Buzz/arclio-rules/issues"
+
 
 [build-system]
 requires = ["hatchling"]
